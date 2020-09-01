@@ -1,0 +1,39 @@
+#!/bin/bash
+
+DEVICE="scull"
+SECTION="misc"
+
+PREFIX="scull"
+FILES="     0 0         1 1         2 2        3 3    priv 16 
+        pipe0 32    pipe1 33    pipe2 34   pipe3 35
+       single 48      uid 64     wuid 80"
+
+INSMOD=/sbin/INSMOD;
+
+function device_specific_post_load(){
+  true;
+}
+
+function device_specific_pre_unload(){
+  true;
+}
+
+CFG=/etc/${DEVICE}.conf
+
+KERNEL=`uname -r`
+
+MODDIR="/lib/modules/${KERNEL}/drivers/${SECTION}"
+if [ ! -d $MODDIR ]; then MODDIR="/lib/modules/${KERNEL}"; fi
+
+if [ "$(id -u)" != "0" ] then
+  echo "you must be root"
+  exit 1
+fi
+
+if [ -r $CFG ] then
+  OWNER=`awk "\\$1==\"owner\" {print \\$2}" $CFG`
+  GROUP=`awk "\\$1==\"group\" {print \\$2}" $CFG`
+  MODE=`awk "\\$1==\"mode\" {print \\$2}" $CFG`
+
+
+
